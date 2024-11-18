@@ -6,7 +6,7 @@ const errorResolver = (err,req,res,next) =>{
     const message = err.message || 'Something Unexpected Occured';
 
     res.status(statusCode).json({
-        status: 'error',
+        status: 'failed',
         message: message,
     });
 }
