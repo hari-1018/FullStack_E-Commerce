@@ -1,4 +1,5 @@
-const Cart =  require('../models/user_Model');
+const User = require('../models/user_Model');
+const Cart =  require('../models/cart_Model');
 const Product = require('../models/product_Model');
 const asyncErrorResolver = require('../middlewares/asyncErrorResolver');
 const CustomError = require('../utils/customErrors');
@@ -14,21 +15,35 @@ const addCart = asyncErrorResolver(async(req,res)=>{
         throw new CustomError("No matching products were found.", 404);
     }
 
-    let cart = await Cart.findOne({ userID });
+    const name = product.name;
 
+    const user = await User.findById(userID);
+    if(!user){
+        throw new CustomError("User not found.", 404);
+    }
+
+    const username = user.username; 
+
+    let cart = await Cart.findOne({ userID });
     const totalPrice = product.price * quantity;
+
     if(!cart){
         cart = new Cart({ 
             userID,
-            products: [{ productID, quantity, totalPrice }] 
+            username,
+            products: [{ productID, name, quantity, totalPrice }] 
         });
-    }else{
+    }
+    
+    else{
         const productExists = cart.products.findIndex((p) => p.productID.toString() === productID);
         if(productExists !== -1){
+            // cart.products[productExists].name = name;
             cart.products[productExists].quantity += quantity;
-            cart.products[productExists].totalPrice += cart.products[productExists].quantity * product.price;
+            cart.products[productExists].totalPrice = cart.products[productExists].quantity * product.price;
+
         }else{
-            cart.products.push({ productID, quantity, totalPrice });
+            cart.products.push({ productID, name, quantity, totalPrice });
         }
     }
 
@@ -42,7 +57,7 @@ const addCart = asyncErrorResolver(async(req,res)=>{
 const viewCart = asyncErrorResolver(async(req,res) =>{
 
     const userID = req.params.id;
-    const cart = await Cart.findOne({ userID }).populate("products.productID");
+    const cart = await Cart.findOne({ userID }).populate("products.productID","name category mrp discount price");
 
     if(!cart || cart.products.length === 0){
         throw new CustomError("Cart is Empty!", 404);
@@ -60,11 +75,11 @@ const removeCart = asyncErrorResolver(async(req,res) =>{
     const {productID} = req.body;
 
     let cart = await Cart.findOne({ userID });
-    if(!cart || cart.product.length === 0){
+    if(!cart || !cart.products || cart.products.length === 0){
         throw new CustomError("Cart is Empty!", 404);
     }
 
-    cart.products = cart.products.filter(product => product.productID !== productID);
+    cart.products = cart.products.filter(product => product.productID.toString() !== productID);
 
     await cart.save();
     res.status(200).json({status:"Success", cart})
