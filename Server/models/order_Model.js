@@ -44,7 +44,7 @@ const orderModel = new mongoose.Schema({
         state : { type: String, required: true},      
         city : { type: String, required: true},
         landmark : { type: String, required: false},
-        pincode : { type: String, required: true},
+        pincode : { type: Number, required: true},
 
     }
 })
