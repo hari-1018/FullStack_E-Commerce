@@ -1,7 +1,7 @@
 const { required } = require('joi');
 const mongoose = require('mongoose');
 
-const productModel = mongoose.Schema({
+const productModel = new mongoose.Schema({
     name: {
         type: String,
         required: true
