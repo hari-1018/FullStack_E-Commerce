@@ -1,4 +1,4 @@
-const asyncErrorResolver = require('../middlewares/asyncErrorResolver');
+const asyncErrorResolver = require('./asyncErrorResolver');
 const CustomError = require('../utils/customErrors')
 const { verifyTokenGenerated } = require('../utils/jwt');
 
@@ -14,6 +14,6 @@ const authorize = asyncErrorResolver(async (req,res,next)=>{
     }
     req.user = decodedToken;
     next();
-})
+});
 
 module.exports = authorize;
