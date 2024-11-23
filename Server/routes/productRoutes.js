@@ -1,7 +1,7 @@
 const express = require('express');
 const productRouter = express.Router();
 
-const { getAllProducts, getsProductsById, getsProductsByCategory, getsProductsBySearching} = require('../controllers/product_Controller');
+const { getAllProducts, getsProductsById, getsProductsByCategory, getsProductsBySearching} = require('../controllers/productControllers');
       
 
 productRouter.get('/searchterm', getsProductsBySearching);

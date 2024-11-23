@@ -1,12 +1,12 @@
 const express = require('express');
 const wishlistRouter = express.Router();
-const authorize = require('../middlewares/authorize') ;
+const authorize = require('../middlewares/auth') ;
 
 const { addWishlist,
         viewWishlist,
         removeWishlist,
         clearWishlist,
-      } = require('../controllers/wishlist_Controller');
+      } = require('../controllers/wishlistControllers');
 
 
 wishlistRouter.use(authorize);

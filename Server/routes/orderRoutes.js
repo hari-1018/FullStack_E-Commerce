@@ -1,7 +1,7 @@
 const express = require('express');
 const orderRouter = express.Router();
-const authorize = require('../middlewares/authorize');
-const { placingOrder, viewOrders } = require('../controllers/order_Controller');
+const authorize = require('../middlewares/auth');
+const { placingOrder, viewOrders } = require('../controllers/orderControllers');
 
 
 
