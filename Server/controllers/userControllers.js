@@ -1,9 +1,9 @@
-const User = require('../models/user_Model');
+const User = require('../models/userModel');
 const asyncErrorResolver = require('../middlewares/asyncErrorResolver');
 const CustomError = require('../utils/customErrors');
 const bcrypt = require('bcrypt');
 const { tokenGenerated } = require('../utils/jwt');
-const {userRegister, userLogin} = require('../validation/user_Validation');
+const {userRegister, userLogin} = require('../validation/userValidation');
 
 // User Register
 const Register = asyncErrorResolver(async(req,res)=>{

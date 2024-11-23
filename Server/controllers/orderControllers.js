@@ -1,6 +1,6 @@
-const Order = require('../models/order_Model');
-const Cart = require('../models/cart_Model');
-const Product = require('../models/product_Model');
+const Order = require('../models/orderModel');
+const Cart = require('../models/cartModel');
+const Product = require('../models/productModel');
 const asyncErrorResolver = require('../middlewares/asyncErrorResolver');
 const CustomError = require('../utils/customErrors');
 
@@ -57,7 +57,7 @@ const viewOrders = asyncErrorResolver(async (req,res) =>{
 
     res.status(200).json({
         status: "Success",
-        message: "Orders od User has been loaded successfully",
+        message: "Orders of User has been loaded successfully",
         orders
     });
 })

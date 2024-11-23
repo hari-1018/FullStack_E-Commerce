@@ -1,6 +1,6 @@
-const User = require('../models/user_Model');
-const Cart =  require('../models/cart_Model');
-const Product = require('../models/product_Model');
+const User = require('../models/userModel');
+const Cart =  require('../models/cartModel');
+const Product = require('../models/productModel');
 const asyncErrorResolver = require('../middlewares/asyncErrorResolver');
 const CustomError = require('../utils/customErrors');
 
