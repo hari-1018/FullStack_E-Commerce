@@ -2,17 +2,13 @@ const User = require('../models/userModel');
 const Product = require('../models/productModel');
 const Order = require('../models/orderModel');
 const asyncErrorResolver = require('../middlewares/asyncErrorResolver');
-const customError = require('../utils/customErrors');
+const CustomError = require('../utils/customErrors');
 
 
 //Get All Users
 const getAllUsers = asyncErrorResolver(async(req,res)=>{
     const users = await User.find({role: 'user'}).select('-password');
-    res.status(200).json({
-        status: "Success",
-        message: "All Users Fetched Successfully",
-        data: users
-    });
+    res.status(200).json({status: "Success", message: "All Users Fetched Successfully", data: users });
 });
 
 
@@ -48,7 +44,7 @@ const blockUser = asyncErrorResolver(async(req,res)=>{
 })
 
 
-//Unlock a User
+//Unblock a User
 const unblockUser = asyncErrorResolver(async(req,res)=>{
     const userID = req.params.id;
 
@@ -94,7 +90,7 @@ const adminProductsById = asyncErrorResolver(async(req,res) =>{
     });
 
 
-//Get Products By ID
+//Get Products By Category
 const adminProductsByCategory = asyncErrorResolver(async(req,res) =>{
 
     const {categoryname} = req.params;
@@ -103,7 +99,9 @@ const adminProductsByCategory = asyncErrorResolver(async(req,res) =>{
         throw new CustomError(`Enter a Category`, 400);
     }
 
-    const productsByCategory = await Product.find({ category: categoryname});
+    const productsByCategory = await Product.find({
+        category: { $regex: new RegExp(`^${categoryname}$`, 'i') }
+    });;
 
     if(productsByCategory.length === 0){
         throw new CustomError(`No Products Found in ${categoryname} category`, 404);
@@ -143,3 +141,178 @@ const deleteProduct = asyncErrorResolver(async(req,res)=>{
     }
     res.status(200).json({status: "Success", message: "Product Deleted Successfully", data: deletedProduct})
 })
+
+
+//All Orders
+const getAllOrders = asyncErrorResolver(async(req,res)=>{
+    const orders = await Order.find({})
+    .populate("userID", "username email")
+    .populate("products.productID", "name price");
+    if(orders.length === 0){
+        throw new CustomError("No Orders Found", 404);
+    }
+    res.status(200).json({status: "Success", message: "All Orders Fetched Successfully", data: orders})
+})
+
+
+// Orders for a specific user
+const getOrdersByUser = asyncErrorResolver(async (req, res) => {
+    const userID  = req.params.id;
+
+    if (!userID) {
+        throw new CustomError("User ID is required", 400);
+    }
+
+    const userOrders = await Order.find({ userID: userID })
+        .populate("userID", "username email")
+        .populate("products.productID", "name price");
+
+    if (userOrders.length === 0) {
+        throw new CustomError(`No Orders Found for User with ID: ${userID}`, 404);
+    }
+
+    res.status(200).json({
+        status: "Success",
+        message: `Orders for User with ID: ${userID} fetched successfully.`,
+        data: userOrders,
+    });
+});
+
+
+
+//Total Products Purchased
+const totalProductsPurchased = asyncErrorResolver(async(req,res)=>{
+    const totalProducts = await Order.aggregate([
+        { $unwind: "$products" },
+        { $group: { _id: null, totalProducts: { $sum: "$products.quantity" } } }
+    ])
+    res.status(200).json({status: "Success", message: "Total Products Purchased", data: totalProducts})
+})
+
+
+//Top Selling Products
+const topSellingProducts = asyncErrorResolver(async (req, res) => {
+    const topProducts = await Order.aggregate([
+        { $unwind: "$products" },
+        {
+            $group: {
+                _id: "$products.productID",
+                totalSold: { $sum: "$products.quantity" },
+            },
+        },
+        { $sort: { totalSold: -1 } }, 
+        { $limit: 10 },
+        {
+            $lookup: {
+                from: "products", 
+                localField: "_id", 
+                foreignField: "_id",
+                as: "productDetails", 
+            },
+        },
+        {
+            $unwind: "$productDetails", 
+        },
+        {
+            $project: {
+                _id: 1,
+                totalSold: 1, 
+                "productDetails.name": 1,
+                "productDetails.price": 1, 
+                "productDetails.category": 1, 
+            },
+        },
+    ]);
+
+    res.status(200).json({status: "Success",message: "Top Selling Products",data: topProducts});
+});
+
+
+
+//Total Revenue
+const totalEarnings = asyncErrorResolver(async(req,res)=>{
+    const earnings = await Order.aggregate([
+        { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } }
+    ]);
+    res.status(200).json({status: "Success", message: "Total Revenue", data: earnings})
+})
+
+//Earnings by month
+const earningsByDate = asyncErrorResolver(async (req, res) => {
+    const { startDate, endDate } = req.query;
+    const earnings = await Order.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $gte: new Date(startDate),
+                    $lte: new Date(endDate),
+                },
+            },
+        },
+        { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
+    ]);
+    res.status(200).json({ status: "Success", message: "Revenue by Date Range", data: earnings });
+});
+
+
+//Top Customers
+const getTopCustomers = asyncErrorResolver(async (req, res) => {
+    const topCustomers = await Order.aggregate([
+        {
+            $group: {
+                _id: "$userID", 
+                totalSpent: { $sum: "$totalAmount" }, 
+            },
+        },
+        {
+            $sort: { totalSpent: -1 }, 
+        },
+        {
+            $limit: 10, 
+        },
+        {
+            $lookup: { 
+                from: "users",
+                localField: "_id",
+                foreignField: "_id",
+                as: "userDetails",
+            },
+        },
+        {
+            $unwind: "$userDetails", 
+        },
+        {
+            $project: { 
+                _id: 0,
+                userID: "$_id",
+                totalSpent: 1,
+                username: "$userDetails.username",
+                email: "$userDetails.email",
+                mobile: "$userDetails.mobilenumber",
+            },
+        },
+    ]);
+
+    res.status(200).json({status: "Success", message: "Top Customers Retrieved Successfully", data: topCustomers});
+});
+
+
+module.exports = {
+    getAllUsers,
+    getUserById,
+    blockUser,
+    unblockUser,
+    adminAllProducts,
+    adminProductsById,
+    adminProductsByCategory,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    getAllOrders,
+    getOrdersByUser,
+    totalProductsPurchased,
+    topSellingProducts,
+    totalEarnings,
+    earningsByDate,
+    getTopCustomers,
+}
