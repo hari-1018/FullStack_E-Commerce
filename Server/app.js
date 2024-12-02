@@ -7,6 +7,7 @@ const cartRoutes = require('./routes/cartRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const accountRoutes = require('./routes/accountRoutes')
+const adminRoutes = require('./routes/adminRoutes');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -19,6 +20,17 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/account", accountRoutes);
+
+
+//Admin Side
+app.use("/api/admin", adminRoutes);
+
+
+//Invalid Routes
+app.all("*", (req,res,next)=>{
+    const error = new customError("Error Not Found", 404);
+    next(error);
+})
 
 
 app.use(errorResolver);
