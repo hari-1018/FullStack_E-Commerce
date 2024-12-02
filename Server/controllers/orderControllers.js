@@ -55,13 +55,8 @@ const viewOrders = asyncErrorResolver(async (req,res) =>{
         throw new CustomError("No Orders Found", 404);
     }
 
-    res.status(200).json({
-        status: "Success",
-        message: "Orders of User has been loaded successfully",
-        orders
-    });
+    res.status(200).json({status: "Success",message: "Orders of User has been loaded successfully", data:orders});
 })
-
 
 
 module.exports = { placingOrder, viewOrders }
