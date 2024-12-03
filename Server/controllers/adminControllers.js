@@ -239,7 +239,10 @@ const totalEarnings = asyncErrorResolver(async(req,res)=>{
 
 //Earnings by month
 const earningsByDate = asyncErrorResolver(async (req, res) => {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate } = req.query.body;
+    if (!startDate || !endDate) {
+        throw new CustomError("Start date and end date are required", 400);
+    }
     const earnings = await Order.aggregate([
         {
             $match: {

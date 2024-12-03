@@ -14,9 +14,9 @@ const auth = asyncErrorResolver(async (req,res,next)=>{
         throw new CustomError("Invalid Token. Try again", 401);
     }
 
-    if (!decodedToken.role) {
-        throw new CustomError("Token does not contain role information.", 401);
-    }
+    // if (!decodedToken.role) {
+    //     throw new CustomError("Token does not contain role information.", 401);
+    // }
 
     req.user = decodedToken;
     next();

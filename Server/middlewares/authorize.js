@@ -7,7 +7,7 @@ const authorize = (roles = []) => {
 
     return (req, res, next) => {
         if (!req.user || !roles.includes(req.user.role)) {
-            throw new CustomError("Access denied" , 403);
+            throw new CustomError("Not an Admin, Access denied!" , 403);
         }
         next();
     };
