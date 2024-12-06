@@ -1,6 +1,7 @@
 const express = require('express');
 const errorResolver = require('./middlewares/errorResolver');
 const app = express();
+const cors = require("cors");
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
@@ -9,6 +10,9 @@ const orderRoutes = require('./routes/orderRoutes');
 const accountRoutes = require('./routes/accountRoutes')
 const adminRoutes = require('./routes/adminRoutes');
 
+app.use(cors({
+    origin: 'http://localhost:5173'
+  }));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
