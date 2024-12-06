@@ -1,9 +1,9 @@
-import { useState, useEffect, useContext} from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/Baby_Buds.png';
 import { BsFillCartFill, BsPersonCircle } from "react-icons/bs";
 import { FaSearch, FaBars, FaTimes } from 'react-icons/fa';
-import { CartContext } from '../../context/CartContext'; 
+import { CartContext } from '../../context/CartContext';
 import { MdMenu } from 'react-icons/md';
 import { IoClose } from 'react-icons/io5';
 import NavMobile from './NavbarMobile';
@@ -29,8 +29,7 @@ const Navbar = () => {
   const [userData, setUserData] = useState(null);
   const [showUserData, setShowUserData] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(cart.length); 
-  const [open, setOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(cart.length);
 
   const checkLoginState = () => {
     const userInfo = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -58,7 +57,6 @@ const Navbar = () => {
     clearCart();
     localStorage.removeItem('loggedInUser');
     window.dispatchEvent(new Event('loginChange'));
-    localStorage.removeItem('id');
     setShowUserData(false);
     setIsLoggedIn(false);
     setUserData(null);
@@ -73,8 +71,8 @@ const Navbar = () => {
         <div className="flex items-center gap-2.5">
           <img className="w-28 h-24" src={logo} alt="Baby-Buds Logo" />
           <p
-            onClick={() => navigate('/') }
-            className="text-lg font-bold tracking-wider cursor-pointer"
+            onClick={() => navigate('/')}
+            className="text-lg font-bold tracking-wider cursor-pointer text-pink-500"
           >
             BABY-BUDS
           </p>
@@ -83,7 +81,6 @@ const Navbar = () => {
         {/* Conditional rendering based on admin login */}
         {isLoggedIn && userData && userData.admin ? (
           <div className="items-center gap-4 hidden md:flex">
-            {/* Show only user circle for admin */}
             <div className="relative">
               <BsPersonCircle
                 className="text-3xl cursor-pointer text-pink-400"
@@ -102,7 +99,7 @@ const Navbar = () => {
           <>
             <ul className="items-center gap-10 font-bold hidden md:flex">
               <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/">HOME</Link></li>
-              <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/shop">SHOP</Link></li>
+              <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/products">SHOP</Link></li>
               <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/about">ABOUT US</Link></li>
               <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/contact">CONTACT US</Link></li>
               
@@ -149,11 +146,10 @@ const Navbar = () => {
                 </div>
               )}
 
-              {/* Only show cart and theme switcher if not admin */}
               {!isLoggedIn || (userData && !userData.admin) ? (
                 <div className="relative flex items-center">
                   <div className="absolute bottom-6 right-0 bg-pink-400 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300">
-                    {cartCount} {/* Count of unique items */}
+                    {cartCount}
                   </div>
                   <Link to={isLoggedIn ? '/cart' : '/login'}>
                     <BsFillCartFill className="text-3xl cursor-pointer text-pink-400" />
@@ -172,20 +168,20 @@ const Navbar = () => {
 
         <div className="inline-block md:hidden text-3xl font-extrabold text-black">
           <button
-            onClick={() => setOpen(!open)}
-            style={{ display: open ? 'none' : 'inline-block' }}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} // Fix here
+            style={{ display: isMobileMenuOpen ? 'none' : 'inline-block' }}
           >
             <MdMenu />
           </button>
           <button
-            onClick={() => setOpen(!open)}
-            style={{ display: open ? 'inline-block' : 'none' }}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} // Fix here
+            style={{ display: isMobileMenuOpen ? 'inline-block' : 'none' }}
           >
             <IoClose />
           </button>
         </div>
       </nav>
-      <NavMobile open={open} />
+      <NavMobile open={isMobileMenuOpen} /> {/* Pass the boolean state here */}
     </>
   );
 };

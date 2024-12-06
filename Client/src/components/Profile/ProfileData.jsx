@@ -39,19 +39,19 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
 
         <div className="flex flex-col p-4 md:w-2/3">
           <h3 className="font-bold text-lg mb-2 text-center text-pink-500">Personal Information</h3>
-          <div className="flex justify-between text-sm mt-8 mb-6">
+          <div className="flex justify-between text-sm mt-8 mb-6 text-pink-500">
             <p>Username:</p>
-            <p className="font-semibold">{userData.username}</p>
+            <p className="font-semibold text-pink-500">{userData.username}</p>
           </div>
-          <div className="flex justify-between text-sm mb-6">
+          <div className="flex justify-between text-sm mb-6 text-pink-500">
             <p>Email:</p>
             <p className="font-semibold">{userData.email}</p>
           </div>
-          <div className="flex justify-between text-sm mb-6">
+          <div className="flex justify-between text-sm mb-6 text-pink-500">
             <p>Phone:</p>
-            <p className="font-semibold">{userData.mobile}</p>
+            <p className="font-semibold">{userData.mobilenumber}</p>
           </div>
-          <div className="flex justify-between items-center text-sm mb-6">
+          <div className="flex justify-between items-center text-sm mb-6 text-pink-500">
             <p>Password:</p>
             <div className="flex items-center">
               <p className="font-semibold mr-2">
@@ -111,7 +111,7 @@ ProfileData.propTypes = {
   userData: PropTypes.shape({
     username: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
-    mobile: PropTypes.string.isRequired,
+    mobilenumber: PropTypes.string.isRequired, // Mobile number passed as a string
     password: PropTypes.string.isRequired,
     admin: PropTypes.bool.isRequired, // Added admin field
   }).isRequired,
