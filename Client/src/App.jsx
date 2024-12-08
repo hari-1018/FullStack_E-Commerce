@@ -10,24 +10,32 @@ import Products from './components/Products/Products'
 import ProductDetails from './components/Products/ProductDetails';
 import ProductsCategory from './components/Products/ProductsCategory'
 import About from './pages/About';
+import Contact from './pages/Contact'
 import { CartProvider } from './context/CartContext'
+// import { WishlistProvider } from './context/WishlistContext';
+// import Wishlist from './components/Wishlist/Wishlist'
+
 
 function App() {
 
   return (
     <>
     <CartProvider>
+    {/* <WishlistProvider> */}
       <Navbar/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/products" element={<Products />} />
+        {/* <Route path="/wishlist" element={<Wishlist />} /> */}
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/products/category/:categoryname" element={<ProductsCategory />} />
       </Routes>  
     <Footer/>
+    {/* </WishlistProvider> */}
     </CartProvider>
     </>
   )

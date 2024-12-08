@@ -21,7 +21,7 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       try {
         const response = await axiosInstance.get(endPoints.PRODUCTS.GET_SINGLE_PRODUCT(id));
-        console.log(response)
+        // console.log(response)
         setProduct(response.data.productsById);
         setLoading(false);
       } catch (err) {

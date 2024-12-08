@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
+import endPoints from '../api/endPoints';
 
 export const CartContext = createContext();
 
@@ -14,14 +15,14 @@ export const CartProvider = ({ children }) => {
       const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
       if (loggedInUser) {
         try {
-          const response = await axios.get(`http://localhost:5000/users/${loggedInUser.id}`);
+          const response = await axiosInstance.get(endPoints.CART.GET_CART(loggedInUser.id));
           const serverCart = response.data.cart || [];
 
           setCart((prevCart) => {
             const mergedCart = [...prevCart];
 
-            serverCart.forEach(serverItem => {
-              const existingItem = mergedCart.find(item => item.id === serverItem.id);
+            serverCart.forEach((serverItem) => {
+              const existingItem = mergedCart.find((item) => item.id === serverItem.id);
               if (existingItem) {
                 existingItem.quantity += serverItem.quantity;
               } else {
@@ -53,8 +54,7 @@ export const CartProvider = ({ children }) => {
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
     if (loggedInUser) {
       try {
-        await axios.patch(`http://localhost:5000/users/${loggedInUser.id}`, { cart });
-
+        await axiosInstance.patch(endPoints.CART.UPDATE_CART(loggedInUser.id), { cart });
       } catch (err) {
         console.error('Error updating cart on server', err);
       }
@@ -63,11 +63,11 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find(item => item.id === product.id);
+      const existingItem = prevCart.find((item) => item.id === product.id);
       let updatedCart;
 
       if (existingItem) {
-        updatedCart = prevCart.map(item =>
+        updatedCart = prevCart.map((item) =>
           item.id === product.id
             ? { ...existingItem, quantity: existingItem.quantity + 1 }
             : item
@@ -83,7 +83,7 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (id) => {
     setCart((prevCart) => {
-      const updatedCart = prevCart.filter(item => item.id !== id);
+      const updatedCart = prevCart.filter((item) => item.id !== id);
       updateCartOnServer(updatedCart);
       return updatedCart;
     });
@@ -91,7 +91,7 @@ export const CartProvider = ({ children }) => {
 
   const increaseQuantity = (id) => {
     setCart((prevCart) => {
-      const updatedCart = prevCart.map(item =>
+      const updatedCart = prevCart.map((item) =>
         item.id === id ? { ...item, quantity: item.quantity + 1 } : item
       );
       updateCartOnServer(updatedCart);
@@ -101,7 +101,7 @@ export const CartProvider = ({ children }) => {
 
   const decreaseQuantity = (id) => {
     setCart((prevCart) => {
-      const updatedCart = prevCart.map(item =>
+      const updatedCart = prevCart.map((item) =>
         item.id === id && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item
       );
       updateCartOnServer(updatedCart);
@@ -109,9 +109,20 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  const clearCart = () => {
-    setCart([]); 
-    localStorage.removeItem('cart');
+  const clearCart = async () => {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    if (loggedInUser) {
+      try {
+        await axiosInstance.delete(endPoints.CART.CLEAR_CART(loggedInUser.id));
+        setCart([]);
+        localStorage.removeItem('cart');
+      } catch (err) {
+        console.error('Error clearing cart on server', err);
+      }
+    } else {
+      setCart([]);
+      localStorage.removeItem('cart');
+    }
   };
 
   const totalItems = () => {
@@ -123,16 +134,18 @@ export const CartProvider = ({ children }) => {
   };
 
   return (
-    <CartContext.Provider value={{ 
-      cart, 
-      addToCart, 
-      removeFromCart, 
-      increaseQuantity, 
-      decreaseQuantity, 
-      clearCart, 
-      totalItems, 
-      totalPrice 
-    }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        increaseQuantity,
+        decreaseQuantity,
+        clearCart,
+        totalItems,
+        totalPrice,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

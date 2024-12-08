@@ -9,12 +9,12 @@ const ProductsCategory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  console.log(categoryname);
+  // console.log(categoryname);
   useEffect(() => {
     const fetchCategoryItems = async () => {
       try {
         const response = await axiosInstance.get(endPoints.PRODUCTS.GET_CATEGORY(categoryname));
-        console.log(response)
+        // console.log(response)
         setItems(response.data.productsByCategory);
       } catch (error){
         console.error('Error Fetching Categories', error);
@@ -39,7 +39,7 @@ const ProductsCategory = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {items.length > 0 ? (
           items.map(item => (
-            <Link key={item.id} to={`/products/${item._id}`}>
+            <Link key={item._id} to={`/products/${item._id}`}>
               <div 
                 className="flex flex-col p-4 border border-gray-200 shadow-lg rounded-xl hover:bg-blue-100 hover:scale-105 transition-transform duration-300 ease-in-out bg-white"
               >

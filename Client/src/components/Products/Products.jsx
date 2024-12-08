@@ -18,7 +18,7 @@ const Products = () => {
         const response = await axiosInstance.get(
           endPoints.PRODUCTS.GET_ALL_PRODUCTS
         );
-        console.log(response);
+        // console.log(response);
 
         if (Array.isArray(response.data.allProducts)) {
           setProducts(response.data.allProducts);
@@ -71,7 +71,7 @@ const Products = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {Array.isArray(products) && products.length > 0 ? (
           products.map((product) => (
-            <Link key={product.id} to={`/products/${product._id}`}>
+            <Link key={product._id} to={`/products/${product._id}`}>
               <div className="relative flex flex-col p-4 border border-gray-200 shadow-lg rounded-xl hover:bg-blue-100 hover:scale-105 transition-transform duration-300 ease-in-out bg-white">
                 <div className="w-full h-40 mb-4 flex items-center justify-center">
                   <img
