@@ -20,16 +20,18 @@ const endPoints = {
       CLEAR_CART: (userID) => `/cart/${userID}/clear`,
     },
     WISHLIST: {
-      GET_WISHLIST: "/wishlist",
+      ADD_TO_WISHLIST: (userID) => `/wishlist/${userID}`,
+      VIEW_WISHLIST: (userID) => `/wishlist/${userID}/`,
+      REMOVE_FROM_WISHLIST: (userID, productID) => `/wishlist/${userID}/${productID}`,
+
     },
     PROFILE: {
       GET_PROFILE: (userID)=> `/account/${userID}`,
       UPDATE_PROFILE: (userID)=> `/account/${userID}`,
     },
     ORDERS: {
-      CREATE: "/orders",
-      GET_USER_ORDERS: "/orders/user",
-      GET_SINGLE_ORDER: (id) => `/orders/${id}`,
+      PLACE_ORDER:(userID) => `/orders/${userID}/placeorder`,
+      GET_USER_ORDERS:(userId) => `/orders/${userId}`,
     },
   };
   

@@ -1,18 +1,20 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/Baby_Buds.png';
-import { BsFillCartFill, BsPersonCircle } from "react-icons/bs";
+import { BsFillCartFill, BsClipboardHeart, BsPersonCircle } from "react-icons/bs";
 import { FaSearch, FaBars, FaTimes } from 'react-icons/fa';
 import { CartContext } from '../../context/CartContext';
+import { WishlistContext } from '../../context/WishlistContext';
 import { MdMenu } from 'react-icons/md';
 import { IoClose } from 'react-icons/io5';
 import NavMobile from './NavbarMobile';
-import ProfileData from '../Profile/ProfileData'; 
+import ProfileData from '../Profile/ProfileData';
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  const { cart, clearCart } = useContext(CartContext); 
+  const { cart, clearCart } = useContext(CartContext);
+  const { wishlist } = useContext(WishlistContext);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -30,6 +32,7 @@ const Navbar = () => {
   const [showUserData, setShowUserData] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(cart.length);
+  const [wishlistCount, setWishlistCount] = useState(wishlist.length); // New wishlistCount state
 
   const checkLoginState = () => {
     const userInfo = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -46,20 +49,27 @@ const Navbar = () => {
     checkLoginState();
     window.addEventListener('loginChange', checkLoginState);
   
-    const updateCartCount = () => setCartCount(cart.length); 
+    const updateCartCount = () => setCartCount(cart.length);
     updateCartCount();
+    const updateWishlistCount = () => setWishlistCount(wishlist.length);
+    updateWishlistCount();
+    console.log("icon", wishlistCount)
+
+
     return () => {
       window.removeEventListener('loginChange', checkLoginState);
     };
-  }, [cart]);
+  }, [cart, wishlist]);
 
   const handleLogout = () => {
     clearCart();
     localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('wishlist'); // Clear wishlist on logout
     window.dispatchEvent(new Event('loginChange'));
     setShowUserData(false);
     setIsLoggedIn(false);
     setUserData(null);
+    setWishlistCount(0); // Reset wishlist count on logout
     navigate('/');
   };
 
@@ -153,6 +163,18 @@ const Navbar = () => {
                   </div>
                   <Link to={isLoggedIn ? '/cart' : '/login'}>
                     <BsFillCartFill className="text-3xl cursor-pointer text-pink-400" />
+                  </Link>
+                </div>
+              ) : null}
+
+              {/* Wishlist icon and count */}
+              {!isLoggedIn || (userData && !userData.admin) ? (
+                <div className="relative flex items-center">
+                  <div className="absolute bottom-6 right-0 bg-pink-400 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300">
+                    {wishlistCount}
+                  </div>
+                  <Link to={isLoggedIn ? '/wishlist' : '/login'}>
+                    <BsClipboardHeart className="text-2xl cursor-pointer text-pink-400" />
                   </Link>
                 </div>
               ) : null}

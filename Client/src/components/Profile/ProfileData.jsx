@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { FaTimes } from 'react-icons/fa';
-import axiosInstance from '../../api/axiosInstance';
-import endPoints from '../../api/endPoints';
+import { useState, useEffect } from "react";
+import { FaTimes } from "react-icons/fa";
+import axiosInstance from "../../api/axiosInstance";
+import endPoints from "../../api/endPoints";
 
 const ProfileData = ({ userData, handleLogout, closeProfile }) => {
   const [profile, setProfile] = useState(null);
@@ -9,6 +9,7 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
   const [updatedProfile, setUpdatedProfile] = useState({});
   const [loading, setLoading] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [error, setError] = useState(null);
 
   // Fetch profile data on component mount
   useEffect(() => {
@@ -17,15 +18,15 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
         const response = await axiosInstance.get(
           endPoints.PROFILE.GET_PROFILE(userData.userID)
         );
-        console.log(response.data)
+        console.log(response.data.account);
         setProfile(response.data.account);
         setUpdatedProfile({
-          username: response.data.account.userID.username,
-          email: response.data.account.userID.email,
-          mobilenumber: response.data.account.userID.mobilenumber,
+          username: response.data.account.userID.username || "",
+          email: response.data.account.userID.email || "",
+          mobilenumber: response.data.account.userID.mobilenumber || "",
         });
-      } catch (error) {
-        console.error("Error fetching profile:", error);
+      } catch (err) {
+        setError("Failed to fetch profile data. Please try again later.");
       }
     };
 
@@ -51,11 +52,10 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
         endPoints.PROFILE.UPDATE_PROFILE(userData.userID),
         updatedProfile
       );
-      console.log(response.data.account);
       setProfile(response.data.account);
       setEditMode(false);
-    } catch (error) {
-      console.error("Error updating profile:", error);
+    } catch (err) {
+      setError("Failed to update profile. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -68,6 +68,14 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
   const handleCancelLogout = () => {
     setShowLogoutConfirm(false);
   };
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   if (!profile) {
     return <div>Loading...</div>;
@@ -97,7 +105,9 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
         </div>
 
         <div className="flex flex-col p-4 md:w-2/3">
-          <h3 className="font-bold text-lg mb-2 text-center text-pink-500">Personal Information</h3>
+          <h3 className="font-bold text-lg mb-2 text-center text-pink-500">
+            Personal Information
+          </h3>
           {editMode ? (
             <>
               <div className="flex flex-col gap-4">
@@ -143,7 +153,9 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
             <>
               <div className="flex justify-between text-sm mt-8 mb-6 text-pink-500">
                 <p>Username:</p>
-                <p className="font-semibold text-pink-500">{profile.userID.username}</p>
+                <p className="font-semibold text-pink-500">
+                  {profile.userID.username}
+                </p>
               </div>
               <div className="flex justify-between text-sm mb-6 text-pink-500">
                 <p>Email:</p>
@@ -152,10 +164,6 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
               <div className="flex justify-between text-sm mb-6 text-pink-500">
                 <p>Phone:</p>
                 <p className="font-semibold">{profile.userID.mobilenumber}</p>
-              </div>
-              <div className="flex justify-between text-sm mb-6 text-pink-500">
-                <p>Address:</p>
-                <p className="font-semibold">{profile.account}</p>
               </div>
               <button
                 onClick={handleEditToggle}
@@ -178,7 +186,9 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
       {showLogoutConfirm && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-lg font-bold mb-4 text-pink-400 text-center">Are you sure you want to logout?</h2>
+            <h2 className="text-lg font-bold mb-4 text-pink-400 text-center">
+              Are you sure you want to logout?
+            </h2>
             <div className="flex justify-between">
               <button
                 onClick={handleCancelLogout}
@@ -187,9 +197,7 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  handleLogout();
-                }}
+                onClick={handleLogout}
                 className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
               >
                 Confirm

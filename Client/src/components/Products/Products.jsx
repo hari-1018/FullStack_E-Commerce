@@ -1,16 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "../../api/axiosInstance";
 import endPoints from "../../api/endPoints";
+import { WishlistContext } from "../../context/WishlistContext";
 
 const Products = () => {
+  const { addToWishlist, removeFromWishlist, isInWishlist } =
+    useContext(WishlistContext);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [wishlist, setWishlist] = useState([]); // Wishlist state
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -18,7 +20,6 @@ const Products = () => {
         const response = await axiosInstance.get(
           endPoints.PRODUCTS.GET_ALL_PRODUCTS
         );
-        // console.log(response);
 
         if (Array.isArray(response.data.allProducts)) {
           setProducts(response.data.allProducts);
@@ -38,21 +39,32 @@ const Products = () => {
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    const storedWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-    setWishlist(storedWishlist);
-  }, []);
-
   const toggleWishlist = (productID) => {
-    setWishlist((prevWishlist) => {
-      const updatedWishlist = prevWishlist.includes(productID)
-        ? prevWishlist.filter((id) => id !== productID)
-        : [...prevWishlist, productID];
-
-      localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
-
-      return updatedWishlist;
-    });
+    if (isInWishlist(productID)) {
+      removeFromWishlist(productID);
+      toast.success("Removed from Wishlist! ❌", {
+        autoClose: 2000,
+        style: {
+          backgroundColor: "#ffe5b4",
+          border: "1px solid #ffcc00",
+          borderRadius: "8px",
+          padding: "10px",
+        },
+        bodyStyle: { fontWeight: "bold", color: "black" },
+      });
+    } else {
+      addToWishlist(productID);
+      toast.success("Added to Wishlist! ✨🎉", {
+        autoClose: 2000,
+        style: {
+          backgroundColor: "#ffe5b4",
+          border: "1px solid #ffcc00",
+          borderRadius: "8px",
+          padding: "10px",
+        },
+        bodyStyle: { fontWeight: "bold", color: "black" },
+      });
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -66,13 +78,16 @@ const Products = () => {
       </h1>
       <p className="text-center font-semibold text-md text-blue-400 mb-8">
         Explore our wide range of premium baby products, designed for your
-        little one&apos;s comfort and care🎉.
+        little one&apos;s comfort and care 🎉.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {Array.isArray(products) && products.length > 0 ? (
           products.map((product) => (
-            <Link key={product._id} to={`/products/${product._id}`}>
-              <div className="relative flex flex-col p-4 border border-gray-200 shadow-lg rounded-xl hover:bg-blue-100 hover:scale-105 transition-transform duration-300 ease-in-out bg-white">
+            <div
+              key={product._id}
+              className="relative flex flex-col p-4 border border-gray-200 shadow-lg rounded-xl hover:bg-blue-100 hover:scale-105 transition-transform duration-300 ease-in-out bg-white"
+            >
+              <Link to={`/products/${product._id}`}>
                 <div className="w-full h-40 mb-4 flex items-center justify-center">
                   <img
                     src={product.image_url}
@@ -89,48 +104,24 @@ const Products = () => {
                 <p className="text-center text-lg font-semibold text-yellow-500 mb-2">
                   ⭐ {product.stars}
                 </p>
+              </Link>
+              <button
+                className="mt-auto py-2 w-full text-white font-bold rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-indigo-500 hover:to-purple-600 shadow-md hover:shadow-xl"
+              >
+                View Details
+              </button>
 
-                <button className="mt-auto py-2 w-full text-white font-bold rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-indigo-500 hover:to-purple-600 shadow-md hover:shadow-xl">
-                  View Details
-                </button>
-
-                {/* Wishlist Icon */}
-                <button
-                  className="absolute right-4 text-red-500 text-xl focus:outline-none"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    const isProductInWishlist = wishlist.includes(product._id);
-                    toggleWishlist(product._id);
-
-                    if (isProductInWishlist) {
-                      toast.success("Removed from Wishlist! ❌", {
-                        autoClose: 2000,
-                        style: {
-                          backgroundColor: "#ffe5b4",
-                          border: "1px solid #ffcc00",
-                          borderRadius: "8px",
-                          padding: "10px",
-                        },
-                        bodyStyle: { fontWeight: "bold", color: "black" },
-                      });
-                    } else {
-                      toast.success("Added to Wishlist! ✨🎉", {
-                        autoClose: 2000,
-                        style: {
-                          backgroundColor: "#ffe5b4",
-                          border: "1px solid #ffcc00",
-                          borderRadius: "8px",
-                          padding: "10px",
-                        },
-                        bodyStyle: { fontWeight: "bold", color: "black" },
-                      });
-                    }
-                  }}
-                >
-                  {wishlist.includes(product._id) ? <FaHeart /> : <FaRegHeart />}
-                </button>
-              </div>
-            </Link>
+              {/* Wishlist Icon */}
+              <button
+                className="absolute right-4 top-4 text-red-500 text-xl focus:outline-none"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent navigation to product link
+                  toggleWishlist(product._id);
+                }}
+              >
+                {isInWishlist(product._id) ? <FaHeart /> : <FaRegHeart />}
+              </button>
+            </div>
           ))
         ) : (
           <p className="text-center text-lg text-red-500">No products found.</p>
