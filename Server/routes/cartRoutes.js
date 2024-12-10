@@ -1,24 +1,26 @@
 const express = require('express');
 const cartRouter = express.Router();
-const authorize = require('../middlewares/auth') ;
+const auth = require('../middlewares/auth') ;
 
 const { addCart,
         viewCart,
         removeCart,
-        updateCart,
+        increaseCart,
+        decreaseCart,
         totalProductsInCart,
         clearCart,
       } = require('../controllers/cartControllers');
 
 
-cartRouter.use(authorize);
+cartRouter.use(auth);
 
 cartRouter.route("/:id")
     .post(addCart)
-    .get(viewCart)
-    .put(updateCart)
-    .delete(removeCart);
+    .get(viewCart);
 
+cartRouter.delete("/:id/:productID",removeCart);
+cartRouter.put('/:id/increase', increaseCart);
+cartRouter.put('/:id/decrease', decreaseCart);
 cartRouter.get('/:id/total-products', totalProductsInCart);
 cartRouter.get('/:id/clear', clearCart);
 

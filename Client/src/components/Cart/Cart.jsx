@@ -38,41 +38,42 @@ const Cart = () => {
       </h1>
 
       {cart.map((item) => (
-        <div key={item.id} className="flex items-center justify-between border-b-2 pb-4 mb-4">
+        <div key={item.productID._id} className="flex items-center justify-between border-b-2 pb-4 mb-4">
           <div className="flex items-center gap-4">
-            <img src={item.image_url} alt={item.name} className="w-16 h-16 object-cover rounded-lg shadow-md" />
+            <img src={item.productID.image_url} alt={item.productID.name} className="w-16 h-16 object-cover rounded-lg shadow-md" />
             <div>
-              <h2 className="text-base font-semibold text-indigo-600">{item.name}</h2>
-              <p className="text-sm text-gray-600">⭐{item.stars}</p>
-              <p className="text-sm text-gray-600">Price: ₹ {item.price}/-</p>
-              <p className="text-sm text-gray-600">In Stock: {item.stock}</p> {/* Display available stock */}
+              <h2 className="text-base font-semibold text-indigo-600">{item.productID.name}</h2>
+              <p className="text-sm text-gray-600">Price: ₹ {item.productID.price}/-</p>
             </div>
           </div>
-
+          
           <div className="flex items-center gap-6">
-            <button onClick={() => decreaseQuantity(item.id)} className="px-3 py-1 bg-red-500 text-white rounded-md">-</button>
+            <button onClick={() => decreaseQuantity(item.productID._id)} className="px-3 py-1 bg-red-500 text-white rounded-md">-</button>
             <p className="text-base font-semibold text-indigo-600">{item.quantity}</p>
             <button 
-              onClick={() => increaseQuantity(item.id)} 
+              onClick={() => increaseQuantity(item.productID._id)} 
               className={`px-3 py-1 ${item.quantity >= item.stock ? 'bg-gray-300 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'} text-white rounded-md`} 
               disabled={item.quantity >= item.stock}
             >
               +
             </button>
-            <p className="text-base font-semibold text-indigo-600">₹{item.price * item.quantity}</p>
-            <button onClick={() => removeFromCart(item.id)} className="text-red-500 text-base bg-transparent border border-red-500 px-3 py-1 rounded-md hover:bg-red-500 hover:text-white">Remove</button>
+            <p className="text-base font-semibold text-indigo-600">₹{item.productID.price * item.quantity}</p>
+            <button onClick={() => removeFromCart(item.productID._id)} className="text-red-500 text-base bg-transparent border border-red-500 px-3 py-1 rounded-md hover:bg-red-500 hover:text-white">Remove</button>
           </div>
         </div>
+        
       ))}
 
       <div className="flex justify-between items-center mt-8">
         <h2 className="text-xl font-bold text-indigo-600">Total Items: {totalItems()}</h2>
-        <h2 className="text-xl font-bold text-indigo-600">Total: ₹{totalPrice()}/-</h2>
+        <h2 className="text-xl font-bold text-indigo-600">Total: ₹{totalPrice().toFixed(2)}/-</h2>
         
         <button onClick={handlePayNow} className="bg-gradient-to-r from-pink-500 to-blue-500 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow-lg transition-transform duration-300 transform hover:scale-110 hover:bg-gradient-to-l hover:from-blue-500 hover:to-pink-500">Pay Now</button>
       </div>
     </div>
+    
   );
 };
+
 
 export default Cart;

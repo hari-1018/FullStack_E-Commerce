@@ -8,12 +8,12 @@ const CustomError = require('../utils/customErrors');
 //View Profile
 const getAccount = asyncErrorResolver(async (req, res) => {
     const userID = req.params.id;
-    const account = await Account.findOne({userID});
+    let account = await Account.findOne({userID}).populate("userID", "username email mobilenumber");
   
     if (!account) {
       throw new CustomError("Profile not found", 404);  
     }
-    
+
     res.status(200).json({
         status: "Success",
         message: "Account Details Fetched Successfully",
@@ -32,44 +32,13 @@ const editAccount = asyncErrorResolver(async (req, res) => {
     new: true,
     upsert: true,
 
-  });
+  }).populate("userID", "username email mobilenumber");
         return res.status(201).json({
             status: "Success",
             message: "Account created successfully",
             account
         });
-    });
-
-
-
-
-
-
-
-//Edit Profile
-// const editAccount = asyncErrorResolver(async (req, res)=>{
-//     const userID = req.params.id;
-
-//     if(!mongoose.Types.ObjectId.isValid(userID)){
-//         throw new CustomError("Invalid User ID", 400);
-//     }
-
-//     const {username, profileImage, mobile, deliveryAddress} = req.body;
-
-
-//     const account = await Account.findOne({userID: mongoose.Types.ObjectId(userID)});
-//     if(!account){
-//         throw new CustomError(`No Account Found with this ${userID}`, 404);
-//     }
-
-//     account.username = username || account.username;
-//     account.profileImage = profileImage || account.profileImage;
-//     account.mobile = mobile || account.mobile;
-//     account.deliveryAddress = {...account.deliveryAddress, ...deliveryAddress};
-
-//     await account.save();
-//     res.status(200).json({status:"Success", message:"Account Updated Successfully", account})
-// });
+    })
 
 
 

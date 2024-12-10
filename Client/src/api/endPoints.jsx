@@ -12,8 +12,9 @@ const endPoints = {
     CART: {
       GET_CART: (userID) => `/cart/${userID}`,
       ADD_TO_CART: (userID) => `/cart/${userID}`,
-      REMOVE_FROM_CART: (userID, productID) => `/cart/${userID}/remove/${productID}`,
-      UPDATE_CART: (userID) => `/cart/${userID}`,
+      REMOVE_FROM_CART: (userID, productID) => `/cart/${userID}/${productID}`,
+      INCREASE_CART: (userID) => `/cart/${userID}/increase`,
+      DECREASE_CART: (userID) => `/cart/${userID}/decrease`,
       CART_TOTAL: (userID) => `/cart/${userID}/total-price`,
       CART_ITEMS: (userID) => `/cart/${userID}/total-items`,
       CLEAR_CART: (userID) => `/cart/${userID}/clear`,
@@ -22,8 +23,8 @@ const endPoints = {
       GET_WISHLIST: "/wishlist",
     },
     PROFILE: {
-      GET_PROFILE: "/profile",
-      UPDATE_PROFILE: "/profile",
+      GET_PROFILE: (userID)=> `/account/${userID}`,
+      UPDATE_PROFILE: (userID)=> `/account/${userID}`,
     },
     ORDERS: {
       CREATE: "/orders",

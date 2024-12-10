@@ -12,6 +12,7 @@ import ProductsCategory from './components/Products/ProductsCategory'
 import About from './pages/About';
 import Contact from './pages/Contact'
 import { CartProvider } from './context/CartContext'
+import Cart from './components/Cart/Cart'
 // import { WishlistProvider } from './context/WishlistContext';
 // import Wishlist from './components/Wishlist/Wishlist'
 
@@ -33,6 +34,7 @@ function App() {
         {/* <Route path="/wishlist" element={<Wishlist />} /> */}
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/products/category/:categoryname" element={<ProductsCategory />} />
+        <Route path="/cart" element={<Cart />} />
       </Routes>  
     <Footer/>
     {/* </WishlistProvider> */}

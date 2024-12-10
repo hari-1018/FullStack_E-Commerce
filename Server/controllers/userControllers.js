@@ -44,7 +44,7 @@ const Login = asyncErrorResolver(async(req,res) =>{
         }
         
         const Token = tokenGenerated(user);
-        res.json({ status: "success", message: "User logged in successfully", Token });
+        res.json({ status: "success", message: "User logged in successfully", Token, userID: user._id });
     });
 
 module.exports = {Register, Login};

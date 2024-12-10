@@ -7,12 +7,10 @@ const auth = asyncErrorResolver(async (req,res,next)=>{
     if(!token){
         throw new CustomError("Authorization denied.Token is required", 401);
     }
-
-    try{
     const decodedToken = verifyTokenGenerated(token);
-    if(!decodedToken || !decodedToken.id){
-        throw new CustomError("Invalid Token. Try again", 401);
-    }
+    // if(!decodedToken || !decodedToken.id){
+    //     throw new CustomError("Invalid Token. Try again", 401);
+    // }
 
     // if (!decodedToken.role) {
     //     throw new CustomError("Token does not contain role information.", 401);
@@ -20,10 +18,7 @@ const auth = asyncErrorResolver(async (req,res,next)=>{
 
     req.user = decodedToken;
     next();
-    }catch(error){
-        console.error("Auth error", error.message);
-        throw new CustomError("Invalid Token. Try again", 401)
-    }
+
 
 });
 
