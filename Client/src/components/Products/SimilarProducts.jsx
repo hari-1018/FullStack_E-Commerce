@@ -49,7 +49,7 @@ const SimilarProducts = ({ currentCategory, currentProductId }) => {
   return (
     <div className="shop-container mb-12 mt-8 px-4">
       <h2 className="text-3xl font-extrabold text-center mb-4 text-pink-400 tracking-wide">
-        Similar Products
+        Recommended Products
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {similarProducts.map((product) => (
@@ -66,7 +66,7 @@ const SimilarProducts = ({ currentCategory, currentProductId }) => {
                 {product.name}
               </h2>
               <p className="text-center text-md font-semibold text-green-600 mb-2">
-                ₹ {product.mrp.toFixed(2)}/-
+                ₹ {product.mrp}/-
               </p>
               <p className="text-center text-lg font-semibold text-yellow-500 mb-2">
                 ⭐ {product.stars}

@@ -4,51 +4,37 @@ const mongoose = require('mongoose');
 const productModel = new mongoose.Schema({
     name: {
         type: String,
-        required: true
     },
     description: {
         type: String,
-        required: true
     },
     mrp: {
         type: Number,
-        required: true
     },
     price: {
         type: Number,
-        required: true
-    },
-    stars: {
-        type: Number,
-        required: true
     },
     category: {
         type: String,
-        required: true
     },
     image_url: {
         type: String,
-        required: true
     },
     flip_image_url: {
         type: String,
-        required: true
     },
     in_stock: {
         type: Boolean,
-        required: true
     },
     discount:{
         type: Number,
-        required: true
     },
     quantity: {
         type: Number,
-        required: true
+        default: 1,
     },
     additional_details:{
         type: String,
-        required: true
     },
     isDeleted: {
         type: Boolean,

@@ -12,7 +12,7 @@ const Wishlist = () => {
     return <p>Error: WishlistContext is not available.</p>;
   }
 
-  const { wishlist, removeFromWishlist, clearWishlist } = wishlistContext;
+  const { wishlist, removeFromWishlist  } = wishlistContext;
 
   if (wishlist.length === 0) {
     return (
@@ -27,18 +27,10 @@ const Wishlist = () => {
 
   return (
     <div className="wishlist-container mb-12 mt-28 px-4">
-      <h1 className="text-4xl font-extrabold text-center text-pink-400">
+      <h1 className="text-4xl font-extrabold text-center mb-4 text-pink-400">
         Your Wishlist
       </h1>
-      <button
-        className="mt-4 mb-6 py-2 px-4 bg-red-500 text-white font-bold rounded-lg"
-        onClick={() => {
-          clearWishlist();
-          toast.success("Wishlist cleared!");
-        }}
-      >
-        Clear Wishlist
-      </button>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {wishlist.map(({ productID }) => (
           <div
@@ -65,7 +57,20 @@ const Wishlist = () => {
               className="mt-4 py-2 px-4 bg-red-500 text-white font-bold rounded-lg"
               onClick={() => {
                 removeFromWishlist(productID._id);
-                toast.success("Removed from Wishlist!");
+                toast.success(
+                  <div
+                    style={{
+                      backgroundColor: "#ffe5b4",
+                      border: "1px solid #ffcc00",
+                      borderRadius: "8px",
+                      padding: "10px",
+                    }}
+                  >
+                    <span style={{ fontWeight: "bold", color: "black" }}>
+                    Removed from Wishlist!
+                    </span>
+                  </div>
+                );
               }}
             >
               Remove

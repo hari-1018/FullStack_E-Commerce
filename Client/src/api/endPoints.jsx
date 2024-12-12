@@ -33,6 +33,25 @@ const endPoints = {
       PLACE_ORDER:(userID) => `/orders/${userID}/placeorder`,
       GET_USER_ORDERS:(userId) => `/orders/${userId}`,
     },
+    ADMIN: { 
+      GET_ALL_USERS: "/admin/users",
+      GET_TOTAL_USERS: "/admin/dashboard/total-users",
+      GET_SINGLE_USER : (userID) => `/admin/users/${userID}`,
+      BLOCK_USER: (userID) => `/admin/users/block/${userID}`,
+      UNBLOCK_USER: (userID) => `/admin/users/unblock/${userID}`,
+      GET_ALL_PRODUCTS: "/admin/products",
+      GET_TOTAL_PRODUCTS: "/admin/dashboard/total-products",
+      ADD_PRODUCT: "/admin/products",
+      GET_SINGLE_PRODUCT: (productID) => `/admin/products/${productID}`,
+      EDIT_PRODUCT: (productID) => `/admin/products/${productID}`,
+      DELETE_PRODUCT: (productID) => `/admin/products/${productID}`,
+      GET_ALL_ORDERS: "/admin/orders",
+      GET_TOTAL_ORDERS: "/admin/dashboard/total-orders",
+      GET_RECENT_ORDER: "/admin/dashboard/recent-orders",
+      GET_SINGLE_ORDER: (userID) => `/admin/orders/${userID}`,
+      GET_EARNINGS: "/admin/dashboard/total-earnings",
+      
+    }
   };
   
   export default endPoints;

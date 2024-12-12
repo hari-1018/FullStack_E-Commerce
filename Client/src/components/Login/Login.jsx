@@ -24,27 +24,27 @@ const Login = () => {
     onSubmit: async (values) => {
       setError(""); // Reset any existing errors
       try {
-        // Send POST request with email and password
         const response = await axiosInstance.post(endPoints.AUTH.LOGIN, {
           email: values.email,
           password: values.password,
         });
 
         const user = response.data;
+        const { role } = response.data;
 
         // Handle the response from your backend
         if (user) {
-          if (user.blocked) {
+          if (user.isBlocked) {
             setError("Your account is temporarily blocked. Try again later.");
             return;
           }
 
           localStorage.setItem("loggedInUser", JSON.stringify(user));
-          localStorage.setItem("id", user.id);
           localStorage.setItem("cart", JSON.stringify(user.cart || []));
+          localStorage.setItem("wishlist", JSON.stringify(user.wishlist || []));
           window.dispatchEvent(new Event("loginChange"));
 
-          if (user.admin) {
+          if (role === "admin") {
             toast.success(
               <div
                 style={{
@@ -59,7 +59,7 @@ const Login = () => {
                 </span>
               </div>
             );
-            navigate("/admin");
+            navigate("/admin/dashboard");
           } else {
             toast.success(
               <div

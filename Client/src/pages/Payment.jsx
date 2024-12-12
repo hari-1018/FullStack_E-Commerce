@@ -3,8 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { FaShippingFast } from "react-icons/fa";
 import { BsCashCoin } from "react-icons/bs";
 import { toast } from 'react-toastify'; 
-import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid'; 
 import axiosInstance from '../api/axiosInstance';
 import endPoints from '../api/endPoints';
 
@@ -12,9 +10,6 @@ const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { cartItems = [], totalAmount = 0 } = location.state || {};
-
-  const userId = localStorage.getItem('id'); 
-
   const [paymentMethod, setPaymentMethod] = useState('');
   const [selectedBank, setSelectedBank] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
@@ -30,7 +25,7 @@ const Payment = () => {
     pincode: false,
     district: false
   });
-  const [isCartCleared, setIsCartCleared] = useState(false);
+//   const [isCartCleared, setIsCartCleared] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmPayment, setShowConfirmPayment] = useState(false); 
 
@@ -107,57 +102,31 @@ const Payment = () => {
     setIsSubmitting(true); 
 
     try {
-      if (!userId) {
-        throw new Error('User ID is not defined. Please log in again.');
+      const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser")); 
+      if (!loggedInUser) {
+        throw new Error('Please log in again.');
       }
 
-      const userResponse = await axios.get(`http://localhost:5000/users/${userId}`);
-      const userData = userResponse.data;
-
-      const newOrder = {
-        id: uuidv4().slice(0, 8),
-        cartItems,
-        totalAmount,
+      const deliveryAddress = {
         shippingAddress,
         landmark,
         city,
         pincode,
         district,
-        paymentMethod,
-        selectedBank: paymentMethod === "Bank Transfer" ? selectedBank : null,
-        orderDate: new Date().toISOString()
       };
 
-      const updatedOrders = userData.order ? [...userData.order, newOrder] : [newOrder];
 
-      await axios.patch(`http://localhost:5000/users/${userId}`, {
-        order: updatedOrders,
-        cart: []
-      });
+
+      const response = await axiosInstance.post(endPoints.ORDERS.PLACE_ORDER(loggedInUser.userID), {deliveryAddress});
+      console.log("Orders", response);
 
       toast.success(
         <div style={{ backgroundColor: '#ffe5b4', border: '1px solid #ffcc00', borderRadius:'8px', padding: '10px'}}>
           <span style={{ fontWeight: 'bold', color: 'black'}}>Success! Your payment is complete. Get ready for your delivery! ✨</span>
         </div>
       );
+      navigate('/');
 
-      setIsCartCleared(true);
-
-      setPaymentMethod('');
-      setShippingAddress('');
-      setLandmark('');
-      setCity('');
-      setPincode('');
-      setDistrict('');
-      setFormErrors({
-        paymentMethod: false,
-        shippingAddress: false,
-        landmark: false,
-        city: false,
-        pincode: false,
-        district: false
-      });
-      setSelectedBank('');
     } catch (error) {
       console.error('Error processing the payment:', error.response ? error.response.data : error.message);
       toast.error('Something went wrong while processing your payment. Please try again.');
@@ -170,35 +139,6 @@ const Payment = () => {
     closeConfirmPayment();
   };
 
-  if (isCartCleared) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-100 to-blue-100 p-8">
-        <h1 className="text-4xl font-bold text-center mb-8">Baby Buds</h1>
-        <p className="text-xl text-indigo-600">You can continue Shopping!</p>
-        <button
-          onClick={() => navigate('/shop')}
-          className="mt-6 bg-pink-500 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow-lg hover:bg-pink-600 transition"
-        >
-          Go to Shop
-        </button>
-      </div>
-    );
-  }
-
-  if (cartItems.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-100 to-blue-100 p-8">
-        <h1 className="text-4xl font-bold text-center mb-8">Baby Buds</h1>
-        <p className="text-xl">Your cart is empty.</p>
-        <button
-          onClick={() => navigate('/shop')}
-          className="mt-6 bg-pink-500 text-white px-6 py-3 rounded-lg font-semibold text-lg shadow-lg hover:bg-pink-600 transition"
-        >
-          Go to Shop
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-gradient-to-r from-pink-100 to-blue-100 p-6 rounded-lg shadow-lg max-w-3xl mx-auto mt-28 mb-28">

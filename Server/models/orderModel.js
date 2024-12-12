@@ -12,10 +12,6 @@ const orderModel = new mongoose.Schema({
         ref: 'products',
         required: true,
         },
-        name: {
-            type: String,
-            required: true,
-        },
         quantity : {
             type: Number,
             required: true,
@@ -40,10 +36,10 @@ const orderModel = new mongoose.Schema({
         required: true,
     },
     deliveryAddress: {
-        housename: { type: String, required: true},
-        state : { type: String, required: true},      
-        city : { type: String, required: true},
-        landmark : { type: String, required: false},
+        housename: { type: String},
+        state : { type: String},      
+        city : { type: String},
+        landmark : { type: String, required: true},
         pincode : { type: Number, required: true},
 
     }

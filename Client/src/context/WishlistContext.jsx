@@ -62,7 +62,6 @@ export const WishlistProvider = ({ children }) => {
   };
 
   const isInWishlist = (productID) => {
-    console.log('Checking if product is in wishlist:', productID);
     return wishlist.some((product) => product.productID._id === productID);
   };
 

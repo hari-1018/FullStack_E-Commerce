@@ -5,9 +5,7 @@ import endPoints from "../../api/endPoints";
 
 const ProfileData = ({ userData, handleLogout, closeProfile }) => {
   const [profile, setProfile] = useState(null);
-  const [editMode, setEditMode] = useState(false);
   const [updatedProfile, setUpdatedProfile] = useState({});
-  const [loading, setLoading] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [error, setError] = useState(null);
 
@@ -18,7 +16,6 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
         const response = await axiosInstance.get(
           endPoints.PROFILE.GET_PROFILE(userData.userID)
         );
-        console.log(response.data.account);
         setProfile(response.data.account);
         setUpdatedProfile({
           username: response.data.account.userID.username || "",
@@ -33,35 +30,10 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
     fetchProfile();
   }, [userData.userID]);
 
-  const handleEditToggle = () => {
-    setEditMode((prev) => !prev);
-  };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setUpdatedProfile((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleProfileUpdate = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosInstance.put(
-        endPoints.PROFILE.UPDATE_PROFILE(userData.userID),
-        updatedProfile
-      );
-      setProfile(response.data.account);
-      setEditMode(false);
-    } catch (err) {
-      setError("Failed to update profile. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleLogoutClick = () => {
+    localStorage.removeItem('loggedInUser');
     setShowLogoutConfirm(true);
   };
 
@@ -108,48 +80,7 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
           <h3 className="font-bold text-lg mb-2 text-center text-pink-500">
             Personal Information
           </h3>
-          {editMode ? (
-            <>
-              <div className="flex flex-col gap-4">
-                <label>
-                  Username:
-                  <input
-                    type="text"
-                    name="username"
-                    value={updatedProfile.username}
-                    onChange={handleInputChange}
-                    className="border rounded px-2 py-1 w-full"
-                  />
-                </label>
-                <label>
-                  Email:
-                  <input
-                    type="email"
-                    name="email"
-                    value={updatedProfile.email}
-                    onChange={handleInputChange}
-                    className="border rounded px-2 py-1 w-full"
-                  />
-                </label>
-                <label>
-                  Phone:
-                  <input
-                    type="text"
-                    name="mobilenumber"
-                    value={updatedProfile.mobilenumber}
-                    onChange={handleInputChange}
-                    className="border rounded px-2 py-1 w-full"
-                  />
-                </label>
-              </div>
-              <button
-                onClick={handleProfileUpdate}
-                className="mt-4 font-bold bg-green-400 text-white py-2 px-4 rounded hover:bg-green-500 w-full"
-              >
-                {loading ? "Updating..." : "Save Changes"}
-              </button>
-            </>
-          ) : (
+
             <>
               <div className="flex justify-between text-sm mt-8 mb-6 text-pink-500">
                 <p>Username:</p>
@@ -165,14 +96,7 @@ const ProfileData = ({ userData, handleLogout, closeProfile }) => {
                 <p>Phone:</p>
                 <p className="font-semibold">{profile.userID.mobilenumber}</p>
               </div>
-              <button
-                onClick={handleEditToggle}
-                className="mt-6 font-bold bg-orange-400 text-white py-2 px-4 rounded hover:bg-orange-500 w-full"
-              >
-                Edit Profile
-              </button>
             </>
-          )}
 
           <button
             onClick={handleLogoutClick}

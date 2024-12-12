@@ -12,6 +12,23 @@ const getAllUsers = asyncErrorResolver(async(req,res)=>{
 });
 
 
+//Get Total Users
+const getTotalUsers = asyncErrorResolver(async (req, res) => {
+    const userCount = await User.aggregate([
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          userCount: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+  
+    res.status(200).json({status: "Success", message: "Total Users Loaded Successfully", userCount})
+
+});
+
+
 //Get User by ID
 const getUserById = asyncErrorResolver(async(req,res)=>{
     const userID = req.params.id;
@@ -155,6 +172,49 @@ const getAllOrders = asyncErrorResolver(async(req,res)=>{
 })
 
 
+//Get Recent Orders
+const getRecentOrders = asyncErrorResolver(async (req, res) => {
+    const orders = await Order.aggregate([
+        {
+            $sort: { orderedDate: -1 }, // Sort by the most recent orders
+        },
+        {
+            $limit: 5,
+        },
+        {
+            $lookup: {
+                from: "users", // Join with the users collection
+                localField: "userID",
+                foreignField: "_id",
+                as: "user",
+            },
+        },
+        {
+            $unwind: "$user", // Ensure one user per order
+        },
+        {
+            $project: {
+                id: "$_id", // Order ID
+                username: "$user.username", // Username from user details
+                cartItems: "$products", // Items in the order
+                orderDate: "$orderedDate", // Ordered date
+                totalAmount: { $sum: "$totalAmount" }, // Calculate total amount from product prices
+            },
+        },
+    ]);
+
+    if (orders.length === 0) {
+        throw new CustomError("No Orders Found", 404);
+    }
+
+    res.status(200).json({
+        status: "Success",
+        message: "Recent Orders Fetched Successfully",
+        data: {orders},
+    });
+});
+
+
 // Orders for a specific user
 const getOrdersByUser = asyncErrorResolver(async (req, res) => {
     const userID  = req.params.id;
@@ -179,12 +239,27 @@ const getOrdersByUser = asyncErrorResolver(async (req, res) => {
 });
 
 
+//Get total orders
+const getTotalOrders = asyncErrorResolver( async (req,res) => {
+    const totalOrders = await Order.aggregate([
+        {
+            $group:{
+                _id: null,
+                totalOrders: { $sum: 1},
+  
+            },
+        },
+    ]);
+  
+    res.status(200).json({status: "Success", message: "Total Orders Fetched Successfully", totalOrders})
+  
+  })
+
 
 //Total Products Purchased
-const totalProductsPurchased = asyncErrorResolver(async(req,res)=>{
-    const totalProducts = await Order.aggregate([
-        { $unwind: "$products" },
-        { $group: { _id: null, totalProducts: { $sum: "$products.quantity" } } }
+const totalProducts = asyncErrorResolver(async(req,res)=>{
+    const totalProducts = await Product.aggregate([
+        { $group: { _id: null, totalProducts: { $sum: 1 } } }
     ])
     res.status(200).json({status: "Success", message: "Total Products Purchased", data: totalProducts})
 })
@@ -302,6 +377,7 @@ const getTopCustomers = asyncErrorResolver(async (req, res) => {
 
 module.exports = {
     getAllUsers,
+    getTotalUsers,
     getUserById,
     blockUser,
     unblockUser,
@@ -312,8 +388,10 @@ module.exports = {
     updateProduct,
     deleteProduct,
     getAllOrders,
+    getTotalOrders,
+    getRecentOrders,
     getOrdersByUser,
-    totalProductsPurchased,
+    totalProducts,
     topSellingProducts,
     totalEarnings,
     earningsByDate,

@@ -32,7 +32,7 @@ const Navbar = () => {
   const [showUserData, setShowUserData] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(cart.length);
-  const [wishlistCount, setWishlistCount] = useState(wishlist.length); // New wishlistCount state
+  const [wishlistCount, setWishlistCount] = useState(wishlist.length);
 
   const checkLoginState = () => {
     const userInfo = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -48,13 +48,11 @@ const Navbar = () => {
   useEffect(() => {
     checkLoginState();
     window.addEventListener('loginChange', checkLoginState);
-  
-    const updateCartCount = () => setCartCount(cart.length);
-    updateCartCount();
-    const updateWishlistCount = () => setWishlistCount(wishlist.length);
-    updateWishlistCount();
-    console.log("icon", wishlistCount)
 
+    const updateCartCount = () => setCartCount(cart.length);
+    const updateWishlistCount = () => setWishlistCount(wishlist.length);
+    updateCartCount();
+    updateWishlistCount();
 
     return () => {
       window.removeEventListener('loginChange', checkLoginState);
@@ -64,12 +62,13 @@ const Navbar = () => {
   const handleLogout = () => {
     clearCart();
     localStorage.removeItem('loggedInUser');
-    localStorage.removeItem('wishlist'); // Clear wishlist on logout
+    localStorage.removeItem('wishlist');
     window.dispatchEvent(new Event('loginChange'));
     setShowUserData(false);
     setIsLoggedIn(false);
     setUserData(null);
-    setWishlistCount(0); // Reset wishlist count on logout
+    setCartCount(0);
+    setWishlistCount(0);
     navigate('/');
   };
 
@@ -88,99 +87,72 @@ const Navbar = () => {
           </p>
         </div>
 
-        {/* Conditional rendering based on admin login */}
-        {isLoggedIn && userData && userData.admin ? (
-          <div className="items-center gap-4 hidden md:flex">
+        <ul className="items-center gap-10 font-bold hidden md:flex">
+          <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/">HOME</Link></li>
+          <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/products">SHOP</Link></li>
+          <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/about">ABOUT US</Link></li>
+          <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/contact">CONTACT US</Link></li>
+        </ul>
+
+        <div className="items-center gap-4 hidden md:flex">
+          <form onSubmit={handleSearchSubmit} className="relative group">
+            <input
+              type="text"
+              placeholder="Search Products..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="search-bar text-gray-800 w-0 transition-all duration-300 rounded-full px-3 py-1 focus:outline-none group-hover:w-[300px] group-hover:border-2 group-hover:border-pink-400 pr-10"
+            />
+            <button type="submit">
+              <FaSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-pink-400 size-6" />
+            </button>
+          </form>
+
+          {!isLoggedIn ? (
+            <button
+              className="px-4 py-2 bg-pink-400 text-white font-bold rounded"
+              onClick={() => navigate('/login')}
+            >
+              Login
+            </button>
+          ) : (
             <div className="relative">
               <BsPersonCircle
                 className="text-3xl cursor-pointer text-pink-400"
                 onClick={() => setShowUserData(!showUserData)}
               />
               {showUserData && (
-                <ProfileData 
-                  userData={userData} 
-                  handleLogout={handleLogout} 
-                  closeProfile={() => setShowUserData(false)} 
+                <ProfileData
+                  userData={userData}
+                  handleLogout={handleLogout}
+                  closeProfile={() => setShowUserData(false)}
                 />
               )}
             </div>
-          </div>
-        ) : (
-          <>
-            <ul className="items-center gap-10 font-bold hidden md:flex">
-              <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/">HOME</Link></li>
-              <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/products">SHOP</Link></li>
-              <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/about">ABOUT US</Link></li>
-              <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/contact">CONTACT US</Link></li>
-              
-              {/* Show "Dashboard" only if admin is logged in */}
-              {isLoggedIn && userData && userData.admin && (
-                <li className="cursor-pointer text-base text-pink-500 hover:text-blue-400"><Link to="/admin">DASHBOARD</Link></li>
-              )}
-            </ul>
+          )}
 
-            <div className="items-center gap-4 hidden md:flex">
-              <form onSubmit={handleSearchSubmit} className="relative group">
-                <input
-                  type="text"
-                  placeholder="Search Products..."
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className="search-bar text-gray-800 w-0 transition-all duration-300 rounded-full px-3 py-1 focus:outline-none group-hover:w-[300px] group-hover:border-2 group-hover:border-pink-400 pr-10"
-                />
-                <button type="submit">
-                  <FaSearch className="absolute right-2 top-1/2 transform -translate-y-1/2 text-pink-400 size-6" />
-                </button>
-              </form>
-
-              {!isLoggedIn ? (
-                <button
-                  className="px-4 py-2 bg-pink-400 text-white font-bold rounded"
-                  onClick={() => navigate('/login')}
-                >
-                  Login
-                </button>
-              ) : (
-                <div className="relative">
-                  <BsPersonCircle
-                    className="text-3xl cursor-pointer text-pink-400"
-                    onClick={() => setShowUserData(!showUserData)}
-                  />
-                  {showUserData && (
-                    <ProfileData 
-                      userData={userData} 
-                      handleLogout={handleLogout} 
-                      closeProfile={() => setShowUserData(false)} 
-                    />
-                  )}
+          {isLoggedIn && (
+            <>
+              <div className="relative flex items-center">
+                <div className="absolute bottom-6 right-0 bg-pink-400 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300">
+                  {cartCount}
                 </div>
-              )}
+                <Link to="/cart">
+                  <BsFillCartFill className="text-3xl cursor-pointer text-pink-400" />
+                </Link>
+              </div>
 
-              {!isLoggedIn || (userData && !userData.admin) ? (
-                <div className="relative flex items-center">
-                  <div className="absolute bottom-6 right-0 bg-pink-400 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300">
-                    {cartCount}
-                  </div>
-                  <Link to={isLoggedIn ? '/cart' : '/login'}>
-                    <BsFillCartFill className="text-3xl cursor-pointer text-pink-400" />
-                  </Link>
+              <div className="relative flex items-center">
+                <div className="absolute bottom-6 right-0 bg-pink-400 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300">
+                  {wishlistCount}
                 </div>
-              ) : null}
-
-              {/* Wishlist icon and count */}
-              {!isLoggedIn || (userData && !userData.admin) ? (
-                <div className="relative flex items-center">
-                  <div className="absolute bottom-6 right-0 bg-pink-400 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center border border-gray-300">
-                    {wishlistCount}
-                  </div>
-                  <Link to={isLoggedIn ? '/wishlist' : '/login'}>
-                    <BsClipboardHeart className="text-2xl cursor-pointer text-pink-400" />
-                  </Link>
-                </div>
-              ) : null}
-            </div>
-          </>
-        )}
+                <Link to="/wishlist">
+                  <BsClipboardHeart className="text-2xl cursor-pointer text-pink-400" />
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
 
         <div className="md:hidden flex items-center">
           <button onClick={toggleMobileMenu} className="text-2xl">
@@ -190,20 +162,20 @@ const Navbar = () => {
 
         <div className="inline-block md:hidden text-3xl font-extrabold text-black">
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} // Fix here
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             style={{ display: isMobileMenuOpen ? 'none' : 'inline-block' }}
           >
             <MdMenu />
           </button>
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} // Fix here
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             style={{ display: isMobileMenuOpen ? 'inline-block' : 'none' }}
           >
             <IoClose />
           </button>
         </div>
       </nav>
-      <NavMobile open={isMobileMenuOpen} /> {/* Pass the boolean state here */}
+      <NavMobile open={isMobileMenuOpen} />
     </>
   );
 };

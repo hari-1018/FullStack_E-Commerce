@@ -31,7 +31,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="cart-container bg-gradient-to-r from-pink-100 to-blue-100 p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-36 mb-28">
+    <div className="cart-container bg-gradient-to-r from-pink-100 to-blue-100 p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-28 mb-28">
       <h1 className="text-2xl font-bold text-indigo-600 flex items-center justify-center mb-8">
         Your Shopping Cart
         <BsFillCartFill className="ml-2 text-2xl" />
@@ -47,8 +47,9 @@ const Cart = () => {
             </div>
           </div>
           
+          
           <div className="flex items-center gap-6">
-            <button onClick={() => decreaseQuantity(item.productID._id)} className="px-3 py-1 bg-red-500 text-white rounded-md">-</button>
+            <button onClick={() => decreaseQuantity(item.productID._id)} className={`px-3 py-1 ${item.quantity === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'} text-white rounded-md`} disabled={item.quantity === 1}>-</button>
             <p className="text-base font-semibold text-indigo-600">{item.quantity}</p>
             <button 
               onClick={() => increaseQuantity(item.productID._id)} 
@@ -63,6 +64,7 @@ const Cart = () => {
         </div>
         
       ))}
+      
 
       <div className="flex justify-between items-center mt-8">
         <h2 className="text-xl font-bold text-indigo-600">Total Items: {totalItems()}</h2>
@@ -74,6 +76,7 @@ const Cart = () => {
     
   );
 };
+
 
 
 export default Cart;

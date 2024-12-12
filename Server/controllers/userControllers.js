@@ -42,9 +42,9 @@ const Login = asyncErrorResolver(async(req,res) =>{
         if(!user || !(await bcrypt.compare(password, user.password))){
             throw new CustomError("Invalid Email or Password, Try Again", 400);
         }
-        
+        const { isBlocked } = user;
         const Token = tokenGenerated(user);
-        res.json({ status: "success", message: "User logged in successfully", Token, userID: user._id });
+        res.json({ status: "success", message: "User logged in successfully", Token, userID: user._id, role:user.role, isBlocked });
     });
 
 module.exports = {Register, Login};

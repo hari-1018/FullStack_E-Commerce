@@ -13,7 +13,7 @@ const placingOrder = asyncErrorResolver(async (req,res) =>{
 
 
     //Products from Cart
-    const cart = await Cart.findOne({ userID }).populate("products.productID", "price");
+    const cart = await Cart.findOne({ userID }).populate("products.productID", "name price");
     if(!cart || cart.products.length ===0){
         throw new CustomError("No Products in Cart", 400);
     }

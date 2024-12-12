@@ -12,10 +12,6 @@ const wishlistModel = new mongoose.Schema({
         ref: 'products',
         required: true,
         },
-        name: {
-            type: String,
-            required: true,
-        },
         }],
 });
 
