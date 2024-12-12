@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import axiosInstance from '../../api/axiosInstance';
 import endPoints from '../../api/endPoints';
 
@@ -13,7 +12,6 @@ function AllCustomers() {
   const fetchCustomers = async () => {
     try {
       const response = await axiosInstance.get(endPoints.ADMIN.GET_ALL_USERS);
-      console.log("Admins all users", response.data.data);
       setCustomers(response.data.data);
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -49,10 +47,7 @@ function AllCustomers() {
   const filteredCustomers = customers.filter((customer) => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
     return (
-      (customer.username?.toLowerCase().includes(lowerCaseSearchTerm) || false) ||
-      (customer.email?.toLowerCase().includes(lowerCaseSearchTerm) || false) ||
-      (customer.mobilenumber?.toString().includes(lowerCaseSearchTerm) || false) ||
-      (customer._id?.toString().includes(lowerCaseSearchTerm) || false)
+      (customer.username?.toLowerCase().includes(lowerCaseSearchTerm) || false)
     );
   });
 
@@ -80,7 +75,6 @@ function AllCustomers() {
               <th className="py-2 px-4 border w-40">Email</th>
               <th className="py-2 px-4 border w-32">Mobile No.</th>
               <th className="py-2 px-4 border w-20">Status</th>
-              <th className="py-2 px-4 border w-24">Order</th>
               <th className="py-2 px-4 border w-24">Action</th>
             </tr>
           </thead>
@@ -97,13 +91,7 @@ function AllCustomers() {
                       {customer.isBlocked ? 'Blocked' : 'Active'}
                     </span>
                   </td>
-                  <td className="py-2 px-2 border">
-                    <Link to={`/admin/customer-order/${customer._id}`}>
-                      <button className="bg-green-500 text-white p-2 rounded hover:bg-green-600">
-                        Order Details
-                      </button>
-                    </Link>
-                  </td>
+
                   <td className="py-2 px-2 border">
                     <button
                       onClick={() => handleBlockUnblock(customer._id, customer.isBlocked)}

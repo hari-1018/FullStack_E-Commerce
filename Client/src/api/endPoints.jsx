@@ -7,7 +7,7 @@ const endPoints = {
       GET_ALL_PRODUCTS: "/products",
       GET_SINGLE_PRODUCT: (id) => `/products/${id}`,
       GET_CATEGORY:(categoryname) => `/products/category/${categoryname}`,
-      SEARCH: (keyword) => `/products/search?keyword=${keyword}`,
+      SEARCH: "/products/searchterm",
     },
     CART: {
       GET_CART: (userID) => `/cart/${userID}`,

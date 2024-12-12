@@ -2,31 +2,18 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import axiosInstance from '../../api/axiosInstance';
+import endPoints from '../../api/endPoints';
 
 function EditProduct() {
-  const [product, setProduct] = useState({
-    name: '',
-    description: '',
-    price: 0,
-    stars: 0,
-    category: '',
-    image_url: '',
-    flip_image_url: '',
-    in_stock: true,
-    stock: '',
-    discount: 0,
-    quantity: 1,
-    additional_details: '',
-    mrp: 0 
-  });
+  const [product, setProduct] = useState(null);
   const navigate = useNavigate();
   const { id } = useParams();
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/item/${id}`);
-      setProduct(response.data);
+      const response = await axiosInstance.get(endPoints.ADMIN.GET_SINGLE_PRODUCT(id));
+      setProduct(response.data.data);
     } catch (error) {
       console.error('Error fetching product:', error);
     }
@@ -34,8 +21,8 @@ function EditProduct() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'price' || name === 'discount' || name === 'stars' || name === 'quantity' || name === 'stock' || name === 'mrp') {
-      setProduct({ ...product, [name]: Number(value) }); 
+    if (['price', 'discount', 'stars', 'quantity', 'stock', 'mrp'].includes(name)) {
+      setProduct({ ...product, [name]: Number(value) });
     } else if (name === 'in_stock') {
       setProduct({ ...product, [name]: value === 'true' });
     } else {
@@ -46,14 +33,13 @@ function EditProduct() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.patch(`http://localhost:5000/item/${id}`, product);
+      await axiosInstance.put(endPoints.ADMIN.EDIT_PRODUCT(id), product);
       navigate('/admin/all-products');
       toast.success(
-        <div style={{ backgroundColor: '#ffe5b4', border: '1px solid #ffcc00', borderRadius:'8px', padding: '10px'}}>
-          <span style={{ fontWeight: 'bold', color: 'black'}}>Updated Product Successfully! 👍</span>
+        <div style={{ backgroundColor: '#ffe5b4', border: '1px solid #ffcc00', borderRadius: '8px', padding: '10px' }}>
+          <span style={{ fontWeight: 'bold', color: 'black' }}>Updated Product Successfully! 👍</span>
         </div>
       );
-
     } catch (error) {
       console.error('Error updating product:', error);
     }
@@ -62,6 +48,8 @@ function EditProduct() {
   useEffect(() => {
     fetchProduct();
   }, [id]);
+
+  if (!product) return <p>Loading...</p>;
 
   return (
     <div className="p-8 bg-gray-100">
@@ -73,7 +61,7 @@ function EditProduct() {
           <input
             type="text"
             name="name"
-            value={product.name}
+            value={product.name || ''}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 text-gray-700"
             required
@@ -83,97 +71,24 @@ function EditProduct() {
         <div className="mb-4">
           <label className="block mb-2 font-semibold">Description:</label>
           <textarea
-            type="text"
             name="description"
-            value={product.description}
+            value={product.description || ''}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 text-gray-700"
             required
           />
         </div>
 
-        {/* Display Discount field */}
         <div className="mb-4">
-          <label className="block mb-2 font-semibold">Discount (%):</label>
+          <label className="block mb-2 font-semibold">₹ Price:</label>
           <input
             type="number"
-            name="discount"
-            value={product.discount}
+            name="price"
+            value={product.price || ''}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 text-gray-700"
             required
           />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-2 font-semibold">₹ MRP:</label>
-          <input
-            type="text"
-            name="mrp"
-            value={product.mrp}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2 text-gray-700"
-            required
-          />
-        </div>
-
-        {/* Display Offer Price if discount > 0 */}
-        {product.discount > 0 ? (
-          <div className="mb-4">
-            <label className="block mb-2 font-semibold">₹ Offer Price:</label>
-            <input
-              type="text"
-              name="price"
-              value={product.price}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2 text-gray-700"
-              required
-            />
-          </div>
-        ) : (
-          <div className="mb-4">
-            <label className="block mb-2 font-semibold">₹ Price:</label>
-            <input
-              type="text"
-              name="price"
-              value={product.price}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2 text-gray-700"
-              required
-            />
-          </div>
-        )}
-
-        <div className="mb-4">
-          <label className="block mb-2 font-semibold">Stars (Rating):</label>
-          <input
-            type="number"
-            name="stars"
-            step="0.01"
-            value={product.stars}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2 text-gray-700"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block mb-2 font-semibold ">Category:</label>
-          <select
-            name="category"
-            value={product.category}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2 text-grey-700 text-gray-800"
-            required
-          >
-            <option value="" disabled>Select Category</option>
-            <option value="Clothes">Clothes</option>
-            <option value="Gear">Baby Gears</option>
-            <option value="Toys">Toys</option>
-            <option value="Care">Baby Care</option>
-            <option value="Food">Foods & Nutritions</option>
-            <option value="Furniture">Furniture & Bedding</option>
-          </select>
         </div>
 
         <div className="mb-4">
@@ -181,7 +96,7 @@ function EditProduct() {
           <input
             type="text"
             name="image_url"
-            value={product.image_url}
+            value={product.image_url || ''}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 text-gray-700"
             required
@@ -193,7 +108,7 @@ function EditProduct() {
           <input
             type="text"
             name="flip_image_url"
-            value={product.flip_image_url}
+            value={product.flip_image_url || ''}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 text-gray-700"
             required
@@ -204,39 +119,13 @@ function EditProduct() {
           <label className="block mb-2 font-semibold">In Stock:</label>
           <select
             name="in_stock"
-            value={product.in_stock}
+            value={product.in_stock ? 'true' : 'false'}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 text-gray-700"
           >
-            <option value={true}>Yes</option>
-            <option value={false}>No</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
           </select>
-        </div>
-
-        {product.in_stock && (
-          <div className="mb-4">
-            <label className="block mb-2 font-semibold">Stocks Available (No.s):</label>
-            <input
-              type="number"
-              name="stock"
-              value={product.stock}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2 text-gray-700"
-              required
-            />
-          </div>
-        )}
-
-        <div className="mb-4">
-          <label className="block mb-2 font-semibold">Quantity:</label>
-          <input
-            type="number"
-            name="quantity"
-            value={product.quantity}
-            onChange={handleChange}
-            className="w-full border rounded px-3 py-2 text-gray-700"
-            required
-          />
         </div>
 
         <div className="mb-4">
@@ -244,7 +133,7 @@ function EditProduct() {
           <input
             type="text"
             name="additional_details"
-            value={product.additional_details}
+            value={product.additional_details || ''}
             onChange={handleChange}
             className="w-full border rounded px-3 py-2 text-gray-700"
             required

@@ -8,7 +8,6 @@ const AllOrders = () => {
     const fetchOrders = async () => {
       try {
         const response = await axiosInstance.get(endPoints.ADMIN.GET_ALL_ORDERS); 
-        console.log("getting orders", response.data.data)
         setOrders(response.data.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
@@ -17,8 +16,6 @@ const AllOrders = () => {
     fetchOrders();
   }, []);
 
-
-  console.log("Orders", orders)
 
   return (
     <div className="p-8 bg-gray-100 ">
